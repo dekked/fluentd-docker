@@ -15,7 +15,7 @@ ADD http://packages.treasuredata.com/GPG-KEY-td-agent /tmp/
 RUN apt-key add /tmp/GPG-KEY-td-agent && \
     echo "deb http://packages.treasuredata.com/2/debian/wheezy/ wheezy contrib" > /etc/apt/sources.list.d/treasure-data.list && \
     apt-get update && \
-    apt-get install -y --force-yes python-setuptools adduser td-agent && \
+    apt-get install -y --force-yes python-setuptools adduser td-agent build-essential libpcre3 libpcre3-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN easy_install j2cli
@@ -32,13 +32,13 @@ RUN ulimit -n 65536
 RUN td-agent-gem install \
     fluent-plugin-s3 \
     fluent-plugin-dynamodb \
-    fluent-plugin-loggly \
     fluent-plugin-tail-multiline \
     fluent-plugin-rewrite-tag-filter \
     fluent-plugin-parser \
     fluent-plugin-record-reformer
 
-ADD ./docker-entrypoint.sh /
+COPY out_loggly.rb /etc/td-agent/plugin/
+COPY ./docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 # We do NOT run as daemon
 CMD ["/usr/sbin/td-agent"]
