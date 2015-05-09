@@ -31,13 +31,18 @@ RUN ulimit -n 65536
 # Install plugins
 RUN td-agent-gem install \
     fluent-plugin-s3 \
+    fluent-plugin-loggly \
     fluent-plugin-dynamodb \
     fluent-plugin-tail-multiline \
     fluent-plugin-rewrite-tag-filter \
     fluent-plugin-parser \
     fluent-plugin-record-reformer
 
+# Plugin modifications.
+# Leave the gem install so we also get the dependencies.
 COPY out_loggly.rb /etc/td-agent/plugin/
+COPY out_dynamodb.rb /etc/td-agent/plugin/
+
 COPY ./docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 # We do NOT run as daemon
